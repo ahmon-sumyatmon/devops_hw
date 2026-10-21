@@ -1,6 +1,6 @@
-# Git Homework Notes
+# Git Learning Note
 
-Homework ခေါင်းစဉ် ၄ ခုကို ကိုယ့်စကားနဲ့ ပြန်ရေးထားတာ။ command တွေကို practice repo မှာ တကယ်စမ်းကြည့်ပြီး မှတ်ထားတယ်။
+Git ဆိုင်ရာ ခေါင်းစဉ် ၄ ခုကို ကိုယ့်စကားနဲ့ ပြန်ရေးထားတဲ့ learning note ပါ။ command တွေကို practice repo မှာ တကယ်စမ်းကြည့်ပြီး မှတ်ထားတယ်။
 
 **မာတိကာ**
 
@@ -13,8 +13,7 @@ Homework ခေါင်းစဉ် ၄ ခုကို ကိုယ့်စ�
             - [1.1.3.1 `ours` ရလဒ်က ဘယ်လိုဖြစ်လဲ](#s1-1-3-1)
             - [1.1.3.2 `ours` အမြဲ merge commit ဖြစ်တယ်](#s1-1-3-2)
             - [1.1.3.3 `ours` ⚠️ လက်တွေ့သုံးရင် သတိထားရန်](#s1-1-3-3)
-            - [1.1.3.4 cherry-pick ဆိုတာ ဘာလဲ](#s1-1-3-4)
-            - [1.1.3.5 `-s ours` နဲ့ `-X ours` မတူဘူး](#s1-1-3-5)
+            - [1.1.3.4 `-s ours` နဲ့ `-X ours` မတူဘူး](#s1-1-3-4)
         - [1.1.4 `resolve`](#s1-1-4)
         - [1.1.5 `subtree`](#s1-1-5)
             - [1.1.5.1 ပထမဆုံးအကြိမ် ထည့်ပုံ](#s1-1-5-1)
@@ -38,6 +37,7 @@ Homework ခေါင်းစဉ် ၄ ခုကို ကိုယ့်စ�
     - [reset – branch tip ကို ပြန်ရွှေ့](#s3-4)
     - [revert – ပြောင်းပြန်လုပ်တဲ့ commit အသစ်ထည့်](#s3-5)
     - [reflog – reset ပြီး ပျောက်သွားသလိုဖြစ်တဲ့ commit ပြန်ရှာ](#s3-6)
+    - [cherry-pick – Commit အဟောင်းထဲက changes ကို ရွေးယူ](#s3-7)
 - [4. Rebase vs Merge](#s4)
     - [Rebase ကို ဘယ်အချိန်သုံးမလဲ](#s4-1)
     - [Conflict commands](#s4-2)
@@ -189,10 +189,10 @@ git diff ours-base...ours-feature             # F ရဲ့ ပြောင်�
 
 | Commit | ဖိုင် | ပြန်ပေါင်းတဲ့အခါ |
 |---|---|---|
-| F1 (`ours` နဲ့ ပေါင်းတုန်းက ရှိပြီးသား) | `f1.txt` | ❌ ဝင်မလာဘူး၊ ဘယ်တော့မှ ဝင်မလာတော့ဘူး |
+| F1 (`ours` နဲ့ ပေါင်းတုန်းက ရှိပြီးသား) | `f1.txt` | ❌ ဤဥပမာတွင် F1 ၏ changes ကို အလိုအလျောက် ပြန်မယူဘူး |
 | F2 (`ours` ပြီးမှ ထပ်လုပ်တာ) | `f2.txt` | ✅ ဝင်လာတယ် |
 
-F1 ကို နောက်မှ ပြန်လိုချင်ရင် merge နဲ့မရတော့ဘူး၊ **cherry-pick** နဲ့ ပြန်ယူရတယ် (အောက်မှာရှင်းထားတယ်)။
+F1 ၏ changes ကို နောက်မှ ပြန်လိုချင်ရင် မူရင်း F1 ကို ထပ် merge လုပ်ရုံနဲ့ ပြန်မရဘူး။ ရွေးယူချင်သော commit ကို **[cherry-pick](#s3-7)** လုပ်ခြင်း သို့မဟုတ် changes ကို ကိုယ်တိုင်ပြန်အသုံးချခြင်း စသည့်နည်းလမ်းကို စဉ်းစားနိုင်တယ်။
 
 **3. `ours` ကို ဘယ်အချိန်သုံးမလဲ**
 
@@ -204,33 +204,7 @@ F1 ကို နောက်မှ ပြန်လိုချင်ရင် me
 
 <a id="s1-1-3-4"></a>
 
-#### 1.1.3.4 cherry-pick ဆိုတာ ဘာလဲ
-
-Commit တစ်ခုရဲ့ changes ကိုပဲ **ရွေးယူပြီး** လက်ရှိ branch ပေါ်မှာ commit အသစ်အဖြစ် ပြန်လုပ်တာ။ Branch တစ်ခုလုံးကို မပေါင်းဘူး။
-
-```
-မလုပ်ခင်:                            cherry-pick Y လုပ်ပြီးနောက်:
-A---B---C  main (HEAD)              A---B---C---Y'  main (HEAD)
- \                                   \
-  X---Y---Z  feature                  X---Y---Z  feature
-```
-
-- `Y'` က Y ရဲ့ changes ပါတဲ့ commit အသစ်။ Hash မတူဘူး၊ parent က C တစ်ခုတည်း။
-- X နဲ့ Z ကိုတော့ မယူဘူး။
-- Merge နဲ့ မတူတာက Y' နဲ့ Y ကြားမှာ history ဆက်နွယ်မှု မရှိဘူး။
-
-```bash
-git log --oneline feature              # လိုချင်တဲ့ commit ရဲ့ hash ရှာ
-git cherry-pick <hash>                 # အဲ့ commit တစ်ခုကို ယူ
-git cherry-pick <hash1> <hash2>        # တစ်ခုထက်ပိုယူ
-```
-
-- ဖိုင်တူကို နှစ်ဘက်လုံးပြင်ထားရင် conflict ဖြစ်နိုင်တယ်။ ဖြေပြီး `git add` လုပ်၊ ပြီးရင် `git cherry-pick --continue`။
-- မလုပ်တော့ရင် `git cherry-pick --abort`။
-
-<a id="s1-1-3-5"></a>
-
-#### 1.1.3.5 `-s ours` နဲ့ `-X ours` မတူဘူး
+#### 1.1.3.4 `-s ours` နဲ့ `-X ours` မတူဘူး
 
 | | လုပ်ပုံ |
 |---|---|
@@ -357,7 +331,7 @@ Strategy က content တွက်ပုံ၊ method က **history ထဲမှ�
 
 | Method | အလုပ်လုပ်ပုံ | Command |
 |---|---|---|
-| Fast-forward | ကိုယ့် branch က incoming ရဲ့ နောက်ကပဲဆိုရင် pointer ကို ရှေ့ရွှေ့လိုက်ရုံ။ **Commit အသစ် မဖြစ်ဘူး**။ | `git merge --ff-only <branch>`  (FF မရရင် ငြင်းတယ်) |
+| Fast-forward | Feature ထဲမှာ main ရဲ့ လက်ရှိ history အားလုံး ပါပြီးသားဆိုရင် main ကို feature ရဲ့ နောက်ဆုံး commit အထိ update လုပ်တယ်။ Feature commits တွေ main history ထဲ ပါလာပြီး ဖိုင်တွေလည်း အဲဒီ commit ရဲ့အခြေအနေကို ပြောင်းတယ်။ **Merge commit အသစ်မလိုဘူး**။ | `git merge --ff-only <branch>`  (FF မရရင် ငြင်းတယ်) |
 | Merge commit | Branch များ၏ history ကို merge commit ဖြင့် ချိတ်သည်။ FF ဖြစ်နိုင်သည့်အခါလည်း `--no-ff` ဖြင့် merge commit ဖန်တီးနိုင်သည်။ | `git merge --no-ff <branch>` |
 | Squash | feature ရဲ့ changes အားလုံးကို staging ထဲ စုထည့်ပေးတယ်။ နောက်မှ ကိုယ်တိုင် ordinary commit `git commit` တစ်ခါလုပ်ရတယ်။ **Merge commit မဟုတ်ဘူး၊ ရိုးရိုး commit တစ်ခု။** | `git merge --squash <branch>` ပြီး `git commit` |
 
@@ -366,17 +340,43 @@ Strategy က content တွက်ပုံ၊ method က **history ထဲမှ�
 
 #### 1.2.1 Fast-forward
 
-```
-မပေါင်းခင်:                     ပေါင်းပြီးနောက်:
-A---B  main (HEAD)            A---B---C---D  main (HEAD), feature/login
-     \
-      C---D  feature/login
+Main ကနေ feature ခွဲပြီး feature မှာပဲ အလုပ်ဆက်လုပ်ထားတယ်၊ main မှာ သီးခြား commit အသစ် မတိုးထားဘူးဆိုပါစို့။ Feature ရဲ့ history ထဲမှာ main ရဲ့ လက်ရှိ commits အားလုံး ပါပြီးသားဖြစ်နေတယ်။
+
+```text
+မပေါင်းခင်:
+A---B---C---D  feature/login
+    ↑
+    main (HEAD)
+
+B = notes.txt ထဲမှာ မူလစာတစ်ကြောင်းရှိ
+C = notes.txt ထဲ စာတစ်ကြောင်းထပ်ထည့်
+D = login.txt ဖိုင်အသစ်ဖန်တီး
 ```
 
-- Commit အသစ်မရှိဘူး၊ `main` ဆိုတဲ့ label ကို D ဆီရွှေ့လိုက်ရုံ။
-- History က တစ်ကြောင်းတည်းဖြစ်သွားတယ်။
+Main ပေါ်မှာနေပြီး ပေါင်းမယ်:
 
-**FF ဘယ်အချိန်ရလဒ်လဲ:** commit အချိန်၊ အရေအတွက်နဲ့ မဆိုင်ဘူး။ **ကိုယ့် branch ရဲ့ tip က incoming ရဲ့ history ထဲမှာ ပါနေရင်** ရတယ်။
+```bash
+git switch main
+git merge --ff-only feature/login
+```
+
+လုပ်ပြီးနောက်:
+
+```text
+A---B---C---D  main (HEAD), feature/login
+```
+
+အလုပ်လုပ်ပုံကို အဆင့်လိုက်ကြည့်ရင်:
+
+1. **Git က history ကိုစစ်တယ်။** D ကနေ parent တွေအတိုင်း နောက်ပြန်လိုက်ရင် C၊ B ကိုတွေ့တယ်။ ဒါကြောင့် main ရဲ့အလုပ်က feature ထဲမှာ ပါပြီးသားဖြစ်ပြီး သီးခြား history နှစ်ခုကို ပြန်ပေါင်းတွက်ရန် မလိုဘူး။
+2. **Main ကို D အထိ update လုပ်တယ်။** အရင် main history က A၊ B ဖြစ်ပေမဲ့ အခု A၊ B၊ C၊ D ဖြစ်လာတယ်။ C နဲ့ D က ရှိပြီးသား commits ဖြစ်ပြီး hashes မပြောင်းဘူး။
+3. **လက်ရှိဖိုင်တွေကိုလည်း update လုပ်တယ်။** ဒီလို clean working tree နဲ့ စမ်းထားသော ဥပမာမှာ `notes.txt` က စာနှစ်ကြောင်းဖြစ်လာပြီး `login.txt` လည်း main ပေါ်မှာ မြင်ရလာမယ်။ Main နဲ့ feature နှစ်ခုလုံးက D ကိုညွှန်လို့ tracked ဖိုင်အခြေအနေ တူသွားတယ်။
+
+ဒါကြောင့် **“pointer ရွှေ့တယ်” ဆိုတာ main က ဘယ် commit အထိ ရောက်နေပြီလဲဆိုတဲ့ အမှတ်အသားကို B မှ D သို့ ပြောင်းတာ** ပါ။ နာမည်အမှတ်အသားသာ ပြောင်းပြီး ဖိုင်တွေ မပြောင်းဘူးလို့ မဆိုလိုပါ။
+
+**Commit အသစ်မရှိဘူးဆိုတာလည်း main မှာ commits ထပ်မပါလာဘူးလို့ မဆိုလိုပါ။** Feature မှာရှိပြီးသား C နဲ့ D တို့ main history ထဲ ပါလာတယ်။ ပေါင်းရန်အတွက် M ဆိုသော merge commit အသစ်ကိုသာ မဖန်တီးတာပါ။ Feature branch ကလည်း D မှာ ဆက်ရှိနေပြီး အလိုအလျောက် မဖျက်ပါ။
+
+**FF ဘယ်အချိန်ရလဲ:** commit အချိန်၊ အရေအတွက်နဲ့ မဆိုင်ဘူး။ **ကိုယ့် branch ရဲ့ tip က incoming ရဲ့ history ထဲမှာ ပါနေရင်** ရတယ်။
 
 ရတဲ့ပုံ (main = B က feature ရဲ့ history ထဲမှာ ပါတယ်):
 
@@ -793,19 +793,61 @@ git reset --hard rescue/lost-work
 `reset` က **ကိုယ်ရောက်နေတဲ့ branch (HEAD ညွှန်တဲ့ branch)** ကိုပဲ ရွှေ့တာ။ `rescue/lost-work` ဆိုတာ "ဘယ်ကိုရွှေ့မလဲ" ဆိုတဲ့ target (C) ကို ညွှန်တဲ့ နာမည်ပဲ။ ဒါကြောင့် `main` ပေါ်မှာ ရှိနေမှ main ရွှေ့တယ်။ `rescue/lost-work` ပေါ်မှာ ရှိနေရင်တော့ မရွှေ့ဘူး (ဘာမှမပြောင်းဘူး)။
 
 ```
-မလုပ်ခင်:
-A---B  main (HEAD)
+မလုပ်ခင်:                       လုပ်ပြီး:
+A---B  main (HEAD)            A---B---C  main (HEAD), rescue/lost-work     <- main က C ဆီရွှေ့
      \
       C  rescue/lost-work
-
-လုပ်ပြီး:
-A---B---C  main (HEAD), rescue/lost-work     <- main က C ဆီရွှေ့
 ```
 
 `reset --hard` မသုံးချင်ရင် `git switch main` ပြီး `git merge --ff-only rescue/lost-work` လည်း ရတယ် (main ကို C ဆီ တိုးရုံပဲ၊ ဖိုင်ပျောက်စရာ မရှိ)။
 
 - Reflog က ကိုယ့် machine ပေါ်မှာပဲ ရှိပြီး (clone/push နဲ့ မလိုက်ဘူး) မှတ်တမ်းဟောင်းတွေ ကြာရင် expire ဖြစ်တယ် (default ရက် ၃၀–၉၀)။
 - Commit မလုပ်ရသေးတဲ့ edit တွေက reflog မှာ မရှိလို့ `reset --hard` လုပ်ပြီးရင် ပြန်မရဘူး။
+
+<a id="s3-7"></a>
+
+### cherry-pick – Commit အဟောင်းထဲက changes ကို ရွေးယူ
+
+`restore` က ဖိုင် version ပြန်ယူတာ၊ `reflog` က commit ပြန်ရှာတာဖြစ်ပြီး `cherry-pick` က **ရှိပြီးသား commit တစ်ခု၏ changes ကို လက်ရှိ branch ပေါ် ပြန်အသုံးချတာ** ပါ။ ဒါကြောင့် commit အဟောင်းက လိုချင်သည့်ပြောင်းလဲမှုကို ရွေးယူသော Time Travel ဆက်စပ်အကြောင်းအရာအဖြစ် ဒီနေရာမှာ ထည့်ထားတယ်။ Merge strategy တစ်ခုတော့ မဟုတ်ပါ။
+
+**ဘယ်အချိန်သုံးမလဲ?**
+
+- Feature branch တစ်ခုလုံးမယူဘဲ bug fix commit တစ်ခုကိုသာ ယူချင်တဲ့အခါ။
+- Development branch မှ fix တစ်ခုကို release branch အဟောင်းသို့ ပြန်ထည့်ချင်တဲ့အခါ (backport)။
+- `ours` နဲ့ history ပေါင်းထားပေမဲ့ မယူခဲ့သော change တစ်ခုကို နောက်မှ ရွေးပြန်ယူချင်တဲ့အခါ။
+
+```text
+မလုပ်ခင်:                       cherry-pick Y လုပ်ပြီး:
+A---B---C  main (HEAD)        A---B---C---Y′  main (HEAD)
+ \                             \
+  X---Y---Z  feature            X---Y---Z     feature (မပြောင်း)
+```
+
+Y′ သည် Y ၏ changes ကို ပြန်အသုံးချထားသော commit အသစ်ဖြစ်ပြီး ဤဥပမာတွင် parent က C ဖြစ်တယ်။ Main ကို Y နဲ့ ancestry အဖြစ် မချိတ်ပါ။ **X နှင့် Z ကို အလိုအလျောက် မယူပါ။** Y က X ၏ code ကို မှီခိုထားလျှင် conflict ဖြစ်ခြင်း သို့မဟုတ် code အလုပ်မလုပ်ခြင်း ဖြစ်နိုင်လို့ dependency နဲ့ tests ကိုစစ်ပါ။
+
+```bash
+# မစမီ clean ဖြစ်ကြောင်းစစ်ပြီး destination branch သို့ပြောင်း
+git status
+git switch main
+
+# ယူချင်သော commit ကို ရှာပြီး changes စစ်
+git log --oneline feature
+git show <COMMIT_HASH>
+
+# COMMIT_HASH ကို မိမိရွေးထားသော hash ဖြင့် အစားထိုး
+git cherry-pick <COMMIT_HASH>
+```
+
+Commit တစ်ခုထက်ပိုယူချင်လျှင် `git cherry-pick <COMMIT_HASH1> <COMMIT_HASH2>` ဖြင့် အစီအစဉ်လိုက်ယူနိုင်တယ်။ ပုံမှန်အားဖြင့် commit တစ်ခုစီအတွက် commit အသစ်တစ်ခုစီ ဖန်တီးပေးတယ်၊ အားလုံးကို commit တစ်ခုတည်းအဖြစ် မပေါင်းပါ။
+
+**Conflict ဖြစ်လျှင်:** markers များဖယ်ပြီး လိုချင်သောရလဒ်ကိုပြင်၊ ဖိုင်သိမ်းပြီး:
+
+```bash
+git add app.txt
+git cherry-pick --continue
+```
+
+ပယ်ဖျက်ရန် `git cherry-pick --abort` သုံးပါ။ `app.txt` ကို တကယ် conflict ဖြစ်သောဖိုင်အမည်ဖြင့် အစားထိုးပါ။ ပြီးလျှင် `git status`၊ `git log -1 --oneline` နှင့် သက်ဆိုင်ရာ tests ဖြင့် စစ်ပါ။
 
 ---
 
@@ -908,8 +950,8 @@ fixup fff8b4a Fix validation typo
 ```
 
 ```
-မလုပ်ခင်: A---B---C---D
-လုပ်ပြီး: A---B---C′       (C′ message = Add validation)
+မလုပ်ခင်:                            လုပ်ပြီး:
+A---B---C---D                       A---B---C′       (C′ message = Add validation)
 ```
 
 ဖိုင်ရဲ့ နောက်ဆုံးအကြောင်းအရာ မပျောက်ဘူး၊ B မပြောင်းဘူး၊ C′ က hash အသစ်။
